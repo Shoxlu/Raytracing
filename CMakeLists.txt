@@ -1,11 +1,28 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(GeneticSimulation CXX)
+project(Raytracing)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_subdirectory(vendor/SDL)
+
+include(FetchContent)
+
+FetchContent_Declare(
+    glfw
+    GIT_REPOSITORY https://github.com/glfw/glfw.git
+    GIT_TAG 3.4
+)
+
+FetchContent_MakeAvailable(glfw)
+
+add_library(glad
+    external/glad/src/glad.c
+)
+
+target_include_directories(glad PUBLIC
+    external/glad/include
+)
 
 include_directories(include)
 
@@ -14,17 +31,16 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp" "src/*.c")
 
 file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "src/*.hpp" "src/*.h" "include/*.h" "include/*.hpp")
 
+add_executable(Raytracing ${SOURCES} ${HEADERS})
 
-if(WIN32)
-    add_executable(GeneticSimulation ${SOURCES} ${HEADERS})
-else()
-    add_executable(GeneticSimulation ${SOURCES} ${HEADERS})
-endif()
-
-target_link_libraries(GeneticSimulation PRIVATE SDL3::SDL3)
+target_link_libraries(Raytracing
+    PRIVATE
+        glfw
+        glad
+)
 
 if(MSVC)
-    target_compile_options(GeneticSimulation PRIVATE /W4)
+    target_compile_options(Raytracing PRIVATE /W4)
 else()
-    target_compile_options(GeneticSimulation PRIVATE -Wall -Wextra)
+    target_compile_options(Raytracing PRIVATE -Wall -Wextra)
 endif()
