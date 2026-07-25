@@ -25,11 +25,6 @@ struct Camera {
 	float fov = 45.0;
 };
 
-struct Line{
-	Vec start;
-	Vec end;
-};
-
 /*
 Utilitaire pour dessiner sur la fenêtre d'application.
 Attributs:
@@ -50,9 +45,6 @@ public:
 	Drawer(Window* window, std::vector<Shader*> shaders);
 	~Drawer();
 	void DrawArrow(Vec origin, Vec end, Color color);
-	//Dessine un ensemble de points
-	void DrawPoints(std::vector<Object>& pointObjects, float* vertices);
-	void DrawPoints(std::vector<Object>& pointObjects, float* vertices, Color color);
 	//Met à jour la camera (la matrice view)
 	void UpdateCamera();
 	//Bouge la camera à une autre camera

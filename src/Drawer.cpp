@@ -1,14 +1,14 @@
 ﻿#include <glad/glad.h>
-#include "Drawer.h"
-#include "Window.h"
+#include <Drawer.h>
+#include <Window.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
-#include "Shader.h"
+#include <Shader.h>
 #include <cmath>
 #include <string>
 #include <Defs.h>
-#include "GLFW/glfw3.h"
-#include "Vector.h"
+#include <GLFW/glfw3.h>
+#include <Vector.h>
 
 
 extern float distance_ratio;
@@ -60,41 +60,6 @@ void Drawer::DrawCross2D(Vec pos, Color color) {
 
     DrawLine({ pos.x - size, pos.y - size}, { pos.x + size, pos.y + size }, color);
     DrawLine({ pos.x + size, pos.y - size}, { pos.x - size, pos.y + size }, color);
-}
-
-void Drawer::DrawPoints(std::vector<Object>& pointObjects, float* vertices)
-{
-    DrawPoints(pointObjects, vertices, Color{ 255, 255, 255 });
-}
-
-void Drawer::DrawPoints(std::vector<Object>& pointObjects, float* vertices, Color color)
-{
-    Shader* shader = shaders[Default];
-
-    shader->use();
-    SendVec3f(shader, "centerPos", 0.0, 0.0, 0.0);
-    SendFloat(shader, "distance_ratio", distance_ratio);
-    SendMatrix(shader, "projection", projection);
-    SendMatrix(shader, "model", model);
-    SendMatrix(shader, "view", view);
-    SendColor(shader, color);
-    glBindVertexArray(VAO);
-
-    // Charge les vertices dans le VBO et dessine le quad (pleins de points isolés)
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    glBufferData(GL_ARRAY_BUFFER, pointObjects.size() * sizeof(float) * 3, nullptr, GL_DYNAMIC_DRAW);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, pointObjects.size() * sizeof(float) * 3, vertices);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDrawArrays(GL_POINTS, 0, (GLsizei)pointObjects.size());
-
-    glDisableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
-    shader->stopUse();
 }
 
 
@@ -191,14 +156,14 @@ void Drawer::DrawRectangle(Vec pos, Vec size, ColorA color) {
     // 2 triangles formant un rectangle
     Vertex vertices[] = {
         // Triangle 1
-        { {-w, -h}, 0.0f, color.r, color.g, color.b, color.a },
-        { {w, -h}, 0.0f, color.r, color.g, color.b, color.a },
-        { {w, h}, 0.0f, color.r, color.g, color.b, color.a },
+        { {-w, -h}, 0.0f, {color.r, color.g, color.b, color.a}},
+        { {w, -h}, 0.0f, {color.r, color.g, color.b, color.a }},
+        { {w, h}, 0.0f, {color.r, color.g, color.b, color.a} },
 
          // Triangle 2
-         { {-w, -h}, 0.0f, color.r, color.g, color.b, color.a },
-         { {w,  h}, 0.0f, color.r, color.g, color.b, color.a },
-         { {-w, h}, 0.0f, color.r, color.g, color.b, color.a },
+         { {-w, -h}, 0.0f, {color.r, color.g, color.b, color.a} },
+         { {w,  h}, 0.0f, {color.r, color.g, color.b, color.a} },
+         { {-w, h}, 0.0f, {color.r, color.g, color.b, color.a} },
     };
 
     glBindBuffer(GL_ARRAY_BUFFER, DEBUG_VBO);

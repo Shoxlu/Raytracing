@@ -1,7 +1,7 @@
 #pragma once
-#include "Vector.h"
+#include <Vector.h>
+#include <cstdint>
 #include <utility>
-#pragma warning(disable:001)
 
 enum ObjTypes {
     None,
