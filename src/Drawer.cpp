@@ -12,7 +12,6 @@
 
 
 extern float distance_ratio;
-extern int n_obj;
 
 Drawer::Drawer() : window(nullptr), 
     VBO(0),
@@ -37,16 +36,6 @@ Drawer::Drawer(Window* window, std::vector<Shader*> shaders) :
     UpdateCamera();
     camera.cameraPos.z = 1525.0f;
     model = glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, n_obj * 3* sizeof(float), NULL, GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, DEBUG_VBO);
-    glBufferData(GL_ARRAY_BUFFER, n_obj * 4 * 6 * sizeof(float), NULL, GL_DYNAMIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
 }
 
 void Drawer::DrawCrosses(std::vector <Vec> pos, Color color) {

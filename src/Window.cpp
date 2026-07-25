@@ -2,7 +2,7 @@
 #include <Windows.h>
 #include <cassert>
 
-//Fonction utilitaire appelée à chaque fois que la fenêtre change de taille.
+//Fonction utilitaire appelï¿½e ï¿½ chaque fois que la fenï¿½tre change de taille.
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -34,8 +34,9 @@ void GLAPIENTRY MessageCallback(GLenum source,
 
 void Window::Init() 
 {
-    //Crée la fenêtre glfw
-    glfwWindow = glfwCreateWindow(width, height, "Physic Simulation", NULL, NULL);
+    //Crï¿½e la fenï¿½tre glfw
+    glfwInit();
+    glfwWindow = glfwCreateWindow(width, height, "Raytracing", NULL, NULL);
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
@@ -46,13 +47,13 @@ void Window::Init()
     //Gestion des erreurs
     if (glfwWindow == nullptr)
     {
-        printf("Echec de la création de la fenêtre GLFW: %x \n", GetLastError());
+        printf("Echec de la crï¿½ation de la fenï¿½tre GLFW: %lx \n", GetLastError());
         glfwTerminate();
         return;
     }
-    //Fixe la fenêtre crée comme étant le contexte actuelle
+    //Fixe la fenï¿½tre crï¿½e comme ï¿½tant le contexte actuelle
     glfwMakeContextCurrent(glfwWindow);
-    //Charge la bibliothèque glad.
+    //Charge la bibliothï¿½que glad.
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         printf("Failed to initialize GLAD\n");
@@ -70,7 +71,7 @@ void Window::Init()
 
 #ifndef NDEBUG
     glEnable(GL_DEBUG_OUTPUT);
-    //glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); // appels synchrones (plus sûr en debug)
+    //glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS); // appels synchrones (plus sï¿½r en debug)
     glDebugMessageCallback(MessageCallback, nullptr);
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
 #endif // !NDEBUG
@@ -91,18 +92,18 @@ void Window::PollEvents()
 void Window::UpdateWindow()
 {
     glfwGetWindowSize(glfwWindow, &width, &height);
-    // Echange les mémoires tampons graphiques. (Actualise l'écran)
+    // Echange les mï¿½moires tampons graphiques. (Actualise l'ï¿½cran)
     glfwSwapBuffers(glfwWindow);
 }
 
 Window::~Window()
 {
     glfwTerminate();
-    //free(glfwWindow); // Pas très sûr
+    //free(glfwWindow); // Pas trï¿½s sï¿½r
 }
 
 
-//Remplit la fenêtre avec une couleur.
+//Remplit la fenï¿½tre avec une couleur.
 //void Window::Fill(int color[3]) {
 //    //self.display.fill([color[0], color[1], color[2]])
 //}

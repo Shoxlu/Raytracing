@@ -6,30 +6,30 @@
 
 
 /*
-Classe de la fenêtre d'application.
-Désignée pour avoir le moins d'intéraction avec les commandes bas niveau de glfw/glad dans les autres objets.
+Classe de la fenï¿½tre d'application.
+Dï¿½signï¿½e pour avoir le moins d'intï¿½raction avec les commandes bas niveau de glfw/glad dans les autres objets.
 Attributs:
-- glfwwindow: GLFWWindow* -> fenêtre d'application glfw
-- fps: double -> nombre d'image par seconde visé
-- width: int -> largeur de la fenêtre
-- height: int -> hauteur de la fenêtre
+- glfwwindow: GLFWWindow* -> fenï¿½tre d'application glfw
+- fps: double -> nombre d'image par seconde visï¿½
+- width: int -> largeur de la fenï¿½tre
+- height: int -> hauteur de la fenï¿½tre
 */
 class Window {
 public:
     Window();
     Window(double w, double h, double fps);
     ~Window();
-    //Vérifie si l'utilisateur a fermé la fenêtre
+    //Vï¿½rifie si l'utilisateur a fermï¿½ la fenï¿½tre
     bool ShouldClose();
-    //Actualise les évènements d'application
+    //Actualise les ï¿½vï¿½nements d'application
     void PollEvents();
-    //Rafraichit la fenêtre
+    //Rafraichit la fenï¿½tre
     void UpdateWindow();
     GLFWwindow* glfwWindow;
-    double fps;
     int width;
     int height;
+    double fps;
 private:
-    //Initialise une fenêtre GLFW
+    //Initialise une fenï¿½tre GLFW
     void Init();
 };

@@ -1,6 +1,4 @@
 ﻿#include "GraEngine.h"
-#include "Object.h"
-#include "QuadTree.h"
 #include <glad/glad.h>
 extern float distance_ratio;
 
@@ -13,7 +11,7 @@ GraEngine::GraEngine(): window(nullptr)
 
 GraEngine::~GraEngine()
 {
-    for (int i = 0; i < shaders.size(); i++) {
+    for (size_t i = 0; i < shaders.size(); i++) {
         delete shaders[i];
     }
 
@@ -29,26 +27,19 @@ GraEngine::GraEngine(Window* window) : window(window)
 
 void GraEngine::Init() {    
     shaders.resize(10);
-    shaders[Particles] = (new Shader("ParticlesVertex.glsl", "DefaultFragment.glsl"));
     shaders[Default] = (new Shader("DefaultVertex.glsl", "DefaultFragment.glsl"));
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
-    drawer = new Drawer(window, shaders, VBO, VAO, EBO);
+    drawer = new Drawer(window, shaders);
 }
 
 
-void GraEngine::Update(std::vector<Object>& objects)
+void GraEngine::Update()
 {
     drawer->UpdateCamera();
-    drawer->DrawPoints(objects.size());
-    //drawer->DrawAxis();
-}
-
-void GraEngine::Update2(std::vector<Object>&objects)
-{
-    drawer->UpdateCamera();
-    drawer->DrawPoints(objects.size());
+    Swap();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //drawer->DrawAxis();
 }
 
