@@ -19,6 +19,8 @@ public:
     //Echange les buffers d'affichage (actualise la surface de dessin)
     void Swap();
 
+    void UpdateCamera();
+
     std::vector<Shader*> shaders;
     Drawer* drawer;
 private:    

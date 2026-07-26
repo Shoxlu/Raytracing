@@ -34,10 +34,14 @@ void GraEngine::Init() {
     drawer = new Drawer(window, shaders);
 }
 
+void GraEngine::UpdateCamera()
+{
+    drawer->UpdateCamera();
+}
 
 void GraEngine::Update()
 {
-    drawer->UpdateCamera();
+    UpdateCamera();
     Swap();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //drawer->DrawAxis();

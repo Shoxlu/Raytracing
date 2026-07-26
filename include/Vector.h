@@ -5,23 +5,20 @@
 #include <immintrin.h>
 
 /*
-Vecteur à 2 dimensions ou moins
+Vecteur ï¿½ 3 dimensions ou moins
 Attributs :
 - x->position en abscisse
-- y->position en ordonnée
+- y->position en ordonnï¿½e
 */
 class Vec {
 public:
-    inline constexpr Vec(float x = 0.0f, float y = 0.0f) : x(x), y(y) {};
-    inline Vec(__m128 xy) :y(0) {
-        _mm_storeu_ps(&x, xy);
-    }
+    inline constexpr Vec(float x = 0.0f, float y = 0.0f, float z = 0.0f) : x(x), y(y), z(z){};
     //Renvoie la norme du Vecteur
     inline float dist() const {
         return sqrtf(dist_sq());
     }
     inline float dist_sq() const {
-        return (x * x + y * y);
+        return (x * x + y * y + z*z);
     }
 
     inline void clear() {
@@ -31,25 +28,25 @@ public:
     }
 
     inline constexpr Vec operator+(const Vec& vec) const {
-        return Vec(x + vec.x, y + vec.y);
+        return Vec(x + vec.x, y + vec.y, z+vec.z);
     }
     inline constexpr Vec operator-(const Vec& vec) const {
-        return Vec(x - vec.x, y - vec.y);
+        return Vec(x - vec.x, y - vec.y, z-vec.z);
     }
     inline constexpr Vec operator*(const Vec& vec) const {
-        return Vec(x * vec.x, y * vec.y);
+        return Vec(x * vec.x, y * vec.y, z*vec.z);
     }
     inline constexpr Vec operator/(const Vec& vec) const {
-        return Vec(x / vec.x, y / vec.y);
+        return Vec(x / vec.x, y / vec.y, z/vec.z);
     }
     inline constexpr Vec operator+(float s) const {
-        return Vec(x + s, y + s);
+        return Vec(x + s, y + s, z+s);
     }
     inline constexpr Vec operator-(float s) const {
-        return Vec(x - s, y - s);
+        return Vec(x - s, y - s, z-s);
     }
     inline constexpr Vec operator*(float s) const {
-        return Vec(x * s, y * s);
+        return Vec(x * s, y * s, z*s);
     }
     inline constexpr Vec operator/(float s) const {
         return operator*(1.0 / s);
@@ -58,34 +55,37 @@ public:
         return *this;
     }
     inline constexpr Vec operator-() const {
-        return Vec(-x, -y);
+        return Vec(-x, -y, -z);
     }
     inline constexpr Vec& operator+=(const Vec& vec) {
         x += vec.x; y += vec.y;
+        z += vec.z;
         return *this;
     }
     inline constexpr Vec& operator-=(const Vec& vec) {
-        x -= vec.x; y -= vec.y;
+        x -= vec.x; y -= vec.y;z -= vec.z;
         return *this;
     }
     inline constexpr Vec& operator*=(const Vec& vec) {
-        x *= vec.x; y *= vec.y;
+        x *= vec.x; y *= vec.y; z *= vec.z;
         return *this;
     }
     inline constexpr Vec& operator/=(const Vec& vec) {
-        x /= vec.x; y /= vec.y;
+        x /= vec.x; y /= vec.y; z /= vec.z;
         return *this;
     }
     inline constexpr Vec& operator+=(float s) {
         x += s; y += s;
+        z += s;
         return *this;
     }
     inline constexpr Vec& operator-=(float s) {
         x -= s; y -= s;
+        z -= s;
         return *this;
     }
     inline constexpr Vec& operator*=(float s) {
-        x *= s; y *= s;
+        x *= s; y *= s; z*=s;
         return *this;
     }
     inline constexpr Vec& operator/=(float s) {
@@ -94,6 +94,8 @@ public:
 
     float x;
     float y;
+    float z;
+
 private:
 
 };
@@ -103,4 +105,3 @@ inline constexpr float rad(float x) {
     return x * conversion;
 }
 
-typedef Vec Force;

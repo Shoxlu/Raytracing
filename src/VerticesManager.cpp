@@ -16,7 +16,6 @@ std::vector<float> VerticesManager::GenerateLine(Vec origin, Vec end) {
 
 std::vector<float> VerticesManager::GenerateRectTex(float cx, float cy, float rx, float ry) {
 
-    float theta;
     std::vector<float> vertices = {
             // positions                      // texture coords
             cx + rx / 2, cy + ry / 2, 0.0f,   1.0f, 1.0f,   // top right
