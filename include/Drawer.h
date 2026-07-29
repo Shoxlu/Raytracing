@@ -49,7 +49,8 @@ public:
 	void DrawCross2D(Vec pos, Color color);
 
 	void DrawRectangle(Vec pos, Vec size, ColorA color);
-
+	void DrawImage(Image &image);
+	GLuint ImageToTex(Image &image);
 	//Desine les axes du plan 
 	void DrawAxis();
 	//Actualise la matrice de projection pour correspondre à la taille de fenêtre

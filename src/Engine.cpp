@@ -26,8 +26,8 @@ Engine::Engine() :
     rayTracer(nullptr),
     graEngine(nullptr),
     simulationState(0),
-    isPaused(false),
     frame_counter(0),
+    isPaused(false),
     verticesPoints(),
     current_time(0)
 {
@@ -44,10 +44,12 @@ Engine::Engine(Window* win):
     frame_counter(0),
     isPaused(false),
     current_time(0),
-    verticesPoints()
+    verticesPoints(),
+    image(win->width, win->height)
 {
     memset(last_fps, 0, nfps*sizeof(double));
     graEngine = new GraEngine(win);
+    graEngine->drawer->ImageToTex(image);
     glfwSetScrollCallback(win->glfwWindow, scroll_callback);
 }
 
@@ -73,17 +75,11 @@ void Engine::Init() {
 
 }
 
-void Engine::StartTests() {
-    Init();
-}
 
 
 void Engine::Start() {
     Init();
-}
-
-void Engine::RestartWithMore() {
-    Clear();
+    Run();
 }
 
 void Engine::Restart() {
@@ -104,18 +100,17 @@ void Engine::UpdateWindow() {
 void Engine::UpdateLogic() {
     UpdateWindow();
     //Actualisation des données
-    if (!isPaused) {
-
-    }
-
+    rayTracer->Render(image, scene);
 }
 
 void Engine::UpdateGraphic() {
+    graEngine->UpdateCamera();
+    graEngine->Update(image);
     graEngine->Swap();
 }
 
 void Engine::Reset() { 
-    memset(last_fps, 0, nfps);
+    memset(last_fps, 0, nfps*sizeof(double));
     //Clear();
     simulationState = Running;
     frame_counter = 0;
@@ -129,7 +124,6 @@ void Engine::Run() {
     while (IsRunning())
     { 
         UpdateLogic();
-        UpdateGraphic();
         real_time = glfwGetTime();
         while (real_time - real_time_before <= 1.0 / window->fps) {
             real_time = glfwGetTime();
@@ -138,6 +132,7 @@ void Engine::Run() {
         real_time_before = glfwGetTime();
         frame_counter = (frame_counter + 1) % INT32_MAX % nfps;
         last_fps[frame_counter] = round(fps);
+        UpdateGraphic();
 
 
         //Gestion des évènements post-actualisation

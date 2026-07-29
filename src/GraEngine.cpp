@@ -1,8 +1,7 @@
 ﻿#include "GraEngine.h"
+#include <RayTracing.h>
 #include <glad/glad.h>
 extern float distance_ratio;
-
-std::vector < std::string> computeShaderFiles = { "ComputeShader.glsl", "UpdateObjects.glsl"};
 
 GraEngine::GraEngine(): window(nullptr)
 {
@@ -39,12 +38,12 @@ void GraEngine::UpdateCamera()
     drawer->UpdateCamera();
 }
 
-void GraEngine::Update()
+void GraEngine::Update(Image& image)
 {
-    UpdateCamera();
+    glClear(GL_COLOR_BUFFER_BIT);
+    drawer->DrawImage(image);
+
     Swap();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    //drawer->DrawAxis();
 }
 
 void GraEngine::Swap() {

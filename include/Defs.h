@@ -1,7 +1,9 @@
 #pragma once
 #include <Vector.h>
+#include <vector>
 #include <cstdint>
 #include <utility>
+#include <Color.h>
 
 enum ObjTypes {
     None,
@@ -15,21 +17,6 @@ enum Shaders {
     Default
 };
 
-
-struct Color {
-	uint8_t r;
-    uint8_t g;
-    uint8_t b;
-};
-
-struct ColorA {
-    ColorA(uint8_t r1, uint8_t g1, uint8_t b1, uint8_t a2) : r(r1), g(g1), b(b1), a(a2){}
-    ColorA(Color c, uint8_t a2): r(c.r), g(c.g), b(c.b), a(a2){}
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-    uint8_t a;
-};
 
 struct Vertex
 {
@@ -54,4 +41,14 @@ struct Line
         v1( a, 0.f, c1), v2 ( b, 0.f, c2)
     {
     }
+};
+
+
+struct Image{
+    Image(size_t width, size_t height): width(width), height(height), pixels(width*height) {}
+    Image(): width(0), height(0) {}
+    size_t width;
+    size_t height;
+    unsigned int texture = -1;
+    std::vector<ColorA> pixels;
 };

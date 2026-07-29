@@ -15,7 +15,7 @@ public:
     //Initialise le moteur graphique.
     void Init();
     //Actualise la fenêtre d'application et dessine toutes les images.
-    void Update();
+    void Update(Image& image);
     //Echange les buffers d'affichage (actualise la surface de dessin)
     void Swap();
 

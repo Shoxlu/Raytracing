@@ -36,6 +36,69 @@ Drawer::Drawer(Window* window, std::vector<Shader*> shaders) :
     UpdateCamera();
     camera.cameraPos.z = 1525.0f;
     model = glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+    
+    float vertices[] =
+    {
+        // position      // UV
+        -1.f, -1.f,      0.f, 0.f,
+        1.f, -1.f,      1.f, 0.f,
+        1.f,  1.f,      1.f, 1.f,
+
+        -1.f, -1.f,      0.f, 0.f,
+        1.f,  1.f,      1.f, 1.f,
+        -1.f,  1.f,      0.f, 1.f
+    };
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER,
+                sizeof(vertices),
+                vertices,
+                GL_STATIC_DRAW);
+
+    glVertexAttribPointer(
+        0,
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        4 * sizeof(float),
+        (void*)0);
+
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(
+        1,
+        2,
+        GL_FLOAT,
+        GL_FALSE,
+        4 * sizeof(float),
+        (void*)(2 * sizeof(float)));
+
+    glEnableVertexAttribArray(1);
+}
+
+GLuint Drawer::ImageToTex(Image& image)
+{
+    GLuint texture;
+
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        GL_RGBA8,
+        image.width,
+        image.height,
+        0,
+        GL_RGBA,
+        GL_UNSIGNED_BYTE,
+        nullptr
+    );
+    image.texture = texture;
+    return texture;
 }
 
 void Drawer::DrawCrosses(std::vector <Vec> pos, Color color) {
@@ -197,6 +260,40 @@ void Drawer::DrawRectangle(Vec pos, Vec size, ColorA color) {
     shader->stopUse();
 }
 
+void Drawer::DrawImage(Image &image)
+{
+
+    glBindTexture(GL_TEXTURE_2D, image.texture);
+
+    glTexSubImage2D(
+        GL_TEXTURE_2D,
+        0,
+        0,
+        0,
+        image.width,
+        image.height,
+        GL_RGBA,
+        GL_UNSIGNED_BYTE,
+        image.pixels.data()
+    );
+
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, image.texture);
+
+    shaders[Default]->use();
+    glUniform1i(
+    glGetUniformLocation(
+        shaders[Default]->ID,
+        "image"),
+    0);
+    glBindVertexArray(VAO);
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    glBindVertexArray(0);
+
+}
 
 void Drawer::UpdateScreenSize()
 {

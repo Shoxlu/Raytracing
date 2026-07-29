@@ -5,13 +5,15 @@
 
 
 
-struct Image{
-    std::vector<Color> pixels;
+
+struct Ray{
+    Vec start;
+    Color color;
+    double brightness;
 };
 
 class RayTracer{
     public:
-        RayTracer(size_t width, size_t height);
         void Render(Image &image, Scene &scene);
 
     private:

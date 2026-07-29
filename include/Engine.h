@@ -12,11 +12,9 @@ public:
     Engine(Window* win);
     ~Engine();
 
-
-    void StartTests();
     //Initialisation du moteur
     void Start();
-    void RestartWithMore();
+
     void CheckSimulationEnd();
 
     void CheckSimulationRestart();
@@ -56,6 +54,9 @@ public:
     float current_time;
     // std::vector<Object> objects;
     std::vector<float> verticesPoints;
+    Image image;
+    Scene scene;
+
 private:
 
 };
