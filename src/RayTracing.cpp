@@ -1,6 +1,7 @@
 ﻿#include <RayTracing.h>
 #include <cstdio>
-float theta = 0;
+#include <chrono>
+
 void RayTracer::Render(Image &image, Scene &scene)
 {
 
@@ -21,11 +22,13 @@ void RayTracer::Render(Image &image, Scene &scene)
     double scale =
         tan(glm::radians(camera.fov * 0.5f));
 
-    Light l{{cos(theta)*40, 0, sin(theta)*40}, {255, 255, 255}};
-    scene.lights.push_back(l);
-    for(size_t y = 0; y < image.height; y++)
+    // size_t traceCallCount = 0;
+    // double traceTotalTimeUs = 0.0;
+    // double traceAverageTimeUs = 0.0;
+    #pragma omp parallel for collapse(2)
+    for(int y = 0; y < image.height; y++)
     {
-        for(size_t x = 0; x < image.width; x++)
+        for(int x = 0; x < image.width; x++)
         {
             double u = (x + 0.5) / image.width;
             double v = (y + 0.5) / image.height;
@@ -47,29 +50,52 @@ void RayTracer::Render(Image &image, Scene &scene)
 
             Ray ray(camera.cameraPos, dir);
 
-
+            // auto start = std::chrono::high_resolution_clock::now();
             image.pixels[y*image.width+x] =
                 Trace(ray, scene);
+            // auto duration = std::chrono::duration<double, std::micro>(
+            // std::chrono::high_resolution_clock::now() - start);
+            // traceCallCount++;
+            // traceTotalTimeUs += duration.count();
+            // traceAverageTimeUs = traceTotalTimeUs / traceCallCount;
         }
     }
-    theta+= rad(2);
-    scene.lights.pop_back();
+    // printf("Total: %f, Avg: %f, N: %u\n", traceTotalTimeUs/1000, traceAverageTimeUs/1000, traceCallCount);
 }
 
 ColorA RayTracer::Trace(Ray &ray, Scene &scene)
 {
-    ColorA color(0, 0, 0, 255);
-    float closest_t = std::numeric_limits<float>::max();
-    Ball b({0.3, 0.2, 0}, {255, 0, 0, 255}, 1.0, 1.0, 10.0);
-    double t;
-    if(Intersect(ray, b, t))
+
+    ColorA color(0, 0,0, 255);
+    double closest_t = std::numeric_limits<double>::max();
+    Ball closest_b({0, 0, 0}, {0, 0, 0, 0});
+    bool hit = false;
+    for(Ball& b: scene.objects)
     {
-        //printf("%f, %f\n", ray.dir.x, ray.dir.y);
+        double t;
+        if(Intersect(ray, b, t))
+        {
+            if(closest_t > t)
+            {
+                hit = true;
+                closest_t = t;
+                closest_b = b;
+                //printf("closest now %f, t %f\n", closest_t, t);
+            }
+        }
+    }
+    if(hit)
+    {
+        double t= closest_t;
+        Ball& b = closest_b;
         Vec hitPoint = ray.start + ray.dir*t;
         Vec normal = normalize(hitPoint - b.pos);
         ColorA lightColor = {ComputeLighting(hitPoint, normal, scene), 255};
-        return MixColorsSub(ray, hitPoint, b.color, b.brightness, b.reflexion)*lightColor;
+        color = MixColorsSub(ray, hitPoint, b.color, b.brightness, b.reflexion)*lightColor;
     }
+
+    
+
     return color;
 }
 

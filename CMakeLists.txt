@@ -35,6 +35,8 @@ FetchContent_MakeAvailable(glm)
 
 include_directories(include)
 
+find_package(OpenMP REQUIRED)
+
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS "src/*.cpp" "src/*.c")
 
@@ -42,15 +44,17 @@ file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "src/*.hpp" "src/*.h" "include/*.h" 
 
 add_executable(Raytracing ${SOURCES} ${HEADERS})
 
+
 target_link_libraries(Raytracing
     PRIVATE
         glfw
         glad
         glm
+        OpenMP::OpenMP_CXX
 )
 
 if(MSVC)
     target_compile_options(Raytracing PRIVATE /W4)
 else()
-    target_compile_options(Raytracing PRIVATE -Wall -Wextra)
+    target_compile_options(Raytracing PRIVATE -O3 -Wall -Wextra -fopenmp)
 endif()

@@ -3,6 +3,9 @@
 
 
 struct Color {
+    /*Constructeur de la couleur*/
+    Color(uint8_t r1, uint8_t g1, uint8_t b1) : r(r1), g(g1), b(b1){}
+    Color(): r(0), g(0), b(0){}
     /*Opérations pour Color*/
     inline Color operator*(float s) const {
         return Color(r * s, g * s, b*s);

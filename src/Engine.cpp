@@ -72,7 +72,16 @@ Engine::~Engine() {
 
 void Engine::Init() {
     simulationState = Running;
-
+    Light l{{-100, 0, 40}, {255, 0, 0}};
+    Light l2{{100, 0, 40}, {0, 0, 255}};
+    Light l3{{0, 0, 10}, {0, 255, 0}};
+    Ball b({50, 0, 0}, {255, 255, 255, 255}, 1.0, 1.0, 10.0);
+    Ball b2({0, 0, -100}, {255, 255, 255, 255}, 1.0, 1.0, 100.0);
+    scene.objects.push_back(b);
+    scene.objects.push_back(b2);
+    scene.lights.push_back(l);
+    scene.lights.push_back(l2);
+    scene.lights.push_back(l3);
 }
 
 
@@ -120,20 +129,22 @@ void Engine::Run() {
     double real_time = 0;
     double real_time_before = 0;
     double fps = 0;
+    double theta = 0;
     while (IsRunning())
     { 
+        scene.objects[0].pos.x = cos(theta)*50;
         UpdateLogic();
         UpdateGraphic();
         real_time = glfwGetTime();
-        while (real_time - real_time_before <= 1.0 / window->fps) {
+        while ( real_time - real_time_before <= 1.0 / window->fps) {
             real_time = glfwGetTime();
         }
         fps = 1.0 / (real_time - real_time_before);
         real_time_before = glfwGetTime();
         frame_counter = (frame_counter + 1) % INT32_MAX % nfps;
         last_fps[frame_counter] = round(fps);
-
-
+        printf("%f\n", last_fps[frame_counter]);
+        theta+= rad(2);
         //Gestion des évènements post-actualisation
         CheckSimulationEnd();
     }
