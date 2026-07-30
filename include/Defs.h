@@ -18,6 +18,13 @@ enum Shaders {
 };
 
 
+struct Light
+{
+    Vec position;
+    Color color;
+};
+
+
 struct Vertex
 {
     Vertex(Vec a, float z1, ColorA c):pos(a), z(z1), color(c){}

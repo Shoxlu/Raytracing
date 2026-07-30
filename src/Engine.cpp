@@ -99,14 +99,13 @@ void Engine::UpdateWindow() {
 
 void Engine::UpdateLogic() {
     UpdateWindow();
+    graEngine->UpdateCamera();
     //Actualisation des données
     rayTracer->Render(image, scene);
 }
 
 void Engine::UpdateGraphic() {
-    graEngine->UpdateCamera();
     graEngine->Update(image);
-    graEngine->Swap();
 }
 
 void Engine::Reset() { 
@@ -124,6 +123,7 @@ void Engine::Run() {
     while (IsRunning())
     { 
         UpdateLogic();
+        UpdateGraphic();
         real_time = glfwGetTime();
         while (real_time - real_time_before <= 1.0 / window->fps) {
             real_time = glfwGetTime();
@@ -132,7 +132,6 @@ void Engine::Run() {
         real_time_before = glfwGetTime();
         frame_counter = (frame_counter + 1) % INT32_MAX % nfps;
         last_fps[frame_counter] = round(fps);
-        UpdateGraphic();
 
 
         //Gestion des évènements post-actualisation

@@ -82,10 +82,11 @@ GLuint Drawer::ImageToTex(Image& image)
 
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
-
+    
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
+    
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexImage2D(
         GL_TEXTURE_2D,
         0,
@@ -262,6 +263,7 @@ void Drawer::DrawRectangle(Vec pos, Vec size, ColorA color) {
 
 void Drawer::DrawImage(Image &image)
 {
+    assert(image.pixels.size() == image.width * image.height);
 
     glBindTexture(GL_TEXTURE_2D, image.texture);
 
@@ -279,6 +281,7 @@ void Drawer::DrawImage(Image &image)
 
 
     glActiveTexture(GL_TEXTURE0);
+    //printf("Drawing image with texture ID: %u\n", image.texture);
     glBindTexture(GL_TEXTURE_2D, image.texture);
 
     shaders[Default]->use();

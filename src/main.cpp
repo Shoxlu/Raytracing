@@ -7,7 +7,7 @@
 
 int main()
 {
-    Window win(800, 600, 60);
+    Window win(1280, 720, 60);
     Engine eng(&win);
     eng.Start();
 }
