@@ -99,11 +99,36 @@ ColorA RayTracer::Trace(Ray &ray, Scene &scene)
     return color;
 }
 
+bool RayTracer::isOccluded(Ray& ray, float distance, Scene& scene)
+{
+    for(Ball& b: scene.objects)
+    {
+        double t;
+        if(Intersect(ray, b, t))
+        {
+            return t < distance;
+        }
+    }
+    return false;
+}
+
 Color RayTracer::ComputeLighting(Vec hitPoint,Vec normal, Scene& scene)
 {
     Color lightcolor;
     for(Light& l: scene.lights)
     {
+        Vec toLight = l.position - hitPoint;
+        float distance = toLight.dist();
+
+        Vec direction = normalize(toLight);
+        Ray shadowRay(hitPoint+normal*0.001f, direction);
+
+
+        if(isOccluded(shadowRay, distance, scene))
+        {
+            continue;
+        }
+
         Vec lightDirection = -normalize(hitPoint-l.position);
         lightcolor += l.color*std::max( dot(normal, lightDirection),0.0);
     }

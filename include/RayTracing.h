@@ -20,6 +20,7 @@ class RayTracer{
         bool Intersect(const Ray& ray,
         const Ball& sphere,
         double& t);
+        bool isOccluded(Ray& ray, float distance, Scene& scene);
         ColorA Trace(Ray &ray, Scene &scene);
         Color ComputeLighting(Vec hitPoint, Vec normal, Scene &scene);
         ColorA MixColorsSub(Ray &ray, Vec hitPoint, ColorA &color, double brightness, double reflexion);
