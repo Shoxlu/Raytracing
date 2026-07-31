@@ -72,16 +72,17 @@ Engine::~Engine() {
 
 void Engine::Init() {
     simulationState = Running;
-    Light l{{-100, 0, 40}, {255, 0, 0}};
-    Light l2{{100, 0, 40}, {0, 0, 255}};
+    Light l{{200, 0, 40}, {255, 255, 255}};
+    Light l2{{-100, 0, 40}, {0, 0, 255}};
     Light l3{{0, 0, 10}, {0, 255, 0}};
-    Ball b({50, 0, 0}, {255, 255, 255, 255}, 1.0, 1.0, 10.0);
-    Ball b2({0, 0, -100}, {255, 255, 255, 255}, 1.0, 1.0, 100.0);
+    Ball b({50, 0, 0}, {255, 0, 255, 255}, 0.5, 0.0, 10.0);
+    Ball b2({0, 0, -100}, {255, 255, 255, 255}, 0.8, 1.0, 100.0);
     scene.objects.push_back(b);
     scene.objects.push_back(b2);
+    // scene.objects.push_back(b3);
     scene.lights.push_back(l);
     scene.lights.push_back(l2);
-    scene.lights.push_back(l3);
+    //scene.lights.push_back(l3);
 }
 
 

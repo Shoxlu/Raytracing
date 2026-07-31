@@ -1,6 +1,18 @@
 ﻿#include <RayTracing.h>
 #include <cstdio>
 #include <chrono>
+#define DEPTH_REFLECT 20
+
+Ray Ray::Reflect(Hit& hit, ColorA c)
+{
+    Vec p = hit.normal * dot(hit.normal, dir);
+    Vec new_dir = dir - p*2;
+    // printf("1: %f %f %f\n2: %f %f %f\nnormal: %f %f %f\n", ray_dir_neg.x, ray_dir_neg.y, ray_dir_neg.z, dir.x, dir.y, dir.z,
+    // normal.x, normal.y, normal.z);
+    Ray reflectionRay(hit.hitPoint+ hit.normal * 0.001, new_dir, {255, 255, 255}, 1.0);
+    return reflectionRay;
+}
+
 
 void RayTracer::Render(Image &image, Scene &scene)
 {
@@ -21,7 +33,7 @@ void RayTracer::Render(Image &image, Scene &scene)
 
     double scale =
         tan(glm::radians(camera.fov * 0.5f));
-
+    Hit dummy;
     // size_t traceCallCount = 0;
     // double traceTotalTimeUs = 0.0;
     // double traceAverageTimeUs = 0.0;
@@ -51,8 +63,9 @@ void RayTracer::Render(Image &image, Scene &scene)
             Ray ray(camera.cameraPos, dir);
 
             // auto start = std::chrono::high_resolution_clock::now();
+
             image.pixels[y*image.width+x] =
-                Trace(ray, scene);
+                Trace(ray, scene, DEPTH_REFLECT, dummy);
             // auto duration = std::chrono::duration<double, std::micro>(
             // std::chrono::high_resolution_clock::now() - start);
             // traceCallCount++;
@@ -63,38 +76,51 @@ void RayTracer::Render(Image &image, Scene &scene)
     // printf("Total: %f, Avg: %f, N: %u\n", traceTotalTimeUs/1000, traceAverageTimeUs/1000, traceCallCount);
 }
 
-ColorA RayTracer::Trace(Ray &ray, Scene &scene)
+ColorA RayTracer::Trace(Ray &ray, Scene &scene, int depth, Hit& res)
 {
 
-    ColorA color(0, 0,0, 255);
+    ColorA color(0, 0,0, 0);
     double closest_t = std::numeric_limits<double>::max();
     Ball closest_b({0, 0, 0}, {0, 0, 0, 0});
-    bool hit = false;
+    bool hit_flag = false;
+    Hit hit;
     for(Ball& b: scene.objects)
     {
-        double t;
-        if(Intersect(ray, b, t))
+        if(Intersect(ray, b, hit))
         {
-            if(closest_t > t)
+            if(closest_t > hit.distance)
             {
-                hit = true;
-                closest_t = t;
+                hit_flag = true;
+                closest_t = hit.distance;
                 closest_b = b;
+                hit.reflection_coeff = b.reflexion;
                 //printf("closest now %f, t %f\n", closest_t, t);
             }
         }
     }
-    if(hit)
+    if(hit_flag)
     {
-        double t= closest_t;
         Ball& b = closest_b;
-        Vec hitPoint = ray.start + ray.dir*t;
-        Vec normal = normalize(hitPoint - b.pos);
-        ColorA lightColor = {ComputeLighting(hitPoint, normal, scene), 255};
-        color = MixColorsSub(ray, hitPoint, b.color, b.brightness, b.reflexion)*lightColor;
+        hit.distance = closest_t;
+        hit.hitPoint = ray.start + ray.dir*hit.distance;
+        hit.normal = normalize( hit.hitPoint - b.pos);
+        ColorA lightColor = {ComputeLighting(hit, scene), 255};
+        color = MixColorsSub(ray, hit.hitPoint, b.color, b.brightness, b.reflexion)*lightColor;
+        if(depth == 0)
+        {
+            return color;
+        }
+        Ray reflectionRay = ray.Reflect(hit, color);
+        Hit next_hit;
+        ColorA color2 = Trace(reflectionRay, scene, depth-1, next_hit);
+        if(color2.a != 0)
+        {
+            double k = b.reflexion;
+            color = color2*k+color*(1-k);
+        }
     }
 
-    
+    res = hit;
 
     return color;
 }
@@ -103,25 +129,25 @@ bool RayTracer::isOccluded(Ray& ray, float distance, Scene& scene)
 {
     for(Ball& b: scene.objects)
     {
-        double t;
+        Hit t;
         if(Intersect(ray, b, t))
         {
-            return t < distance;
+            return t.distance <= distance;
         }
     }
     return false;
 }
 
-Color RayTracer::ComputeLighting(Vec hitPoint,Vec normal, Scene& scene)
+Color RayTracer::ComputeLighting(Hit& hit, Scene& scene)
 {
     Color lightcolor;
     for(Light& l: scene.lights)
     {
-        Vec toLight = l.position - hitPoint;
+        Vec toLight = l.position - hit.hitPoint;
         float distance = toLight.dist();
 
         Vec direction = normalize(toLight);
-        Ray shadowRay(hitPoint+normal*0.001f, direction);
+        Ray shadowRay(hit.hitPoint+hit.normal*0.001f, direction);
 
 
         if(isOccluded(shadowRay, distance, scene))
@@ -129,8 +155,8 @@ Color RayTracer::ComputeLighting(Vec hitPoint,Vec normal, Scene& scene)
             continue;
         }
 
-        Vec lightDirection = -normalize(hitPoint-l.position);
-        lightcolor += l.color*std::max( dot(normal, lightDirection),0.0);
+        Vec lightDirection = -normalize(hit.hitPoint-l.position);
+        lightcolor += l.color*std::max( dot(hit.normal, lightDirection),0.0);
     }
     float r = lightcolor.r/255.0;
     float g = lightcolor.g/255.0;
@@ -141,7 +167,7 @@ Color RayTracer::ComputeLighting(Vec hitPoint,Vec normal, Scene& scene)
 bool RayTracer::Intersect(
     const Ray& ray,
     const Ball& sphere,
-    double& t)
+    Hit& hit)
 {
     Vec oc = ray.start - sphere.pos;
 
@@ -154,17 +180,17 @@ bool RayTracer::Intersect(
     if(delta < 0)
         return false;
 
-    t = (-b - sqrt(delta)) / (2*a);
+    hit.distance = (-b - sqrt(delta)) / (2*a);
 
-    return t > 0;
+    return hit.distance > 0;
 }
 
 ColorA RayTracer::MixColorsSub(Ray& ray,Vec hitPoint, ColorA& color, double brightness, double reflexion)
 {
     ColorA mixedColor;
-    mixedColor.r = std::min(255.0, (ray.color.r/255.0 * ray.brightness * color.r/255.0 * reflexion)*255);
-    mixedColor.g = std::min(255.0, (ray.color.g/255.0 * ray.brightness * color.g/255.0 * reflexion)*255);
-    mixedColor.b = std::min(255.0, (ray.color.b/255.0 * ray.brightness * color.b/255.0 * reflexion)*255);
+    mixedColor.r = std::min(255.0, (ray.color.r/255.0 * ray.brightness * color.r/255.0)*255);
+    mixedColor.g = std::min(255.0, (ray.color.g/255.0 * ray.brightness * color.g/255.0)*255);
+    mixedColor.b = std::min(255.0, (ray.color.b/255.0 * ray.brightness * color.b/255.0)*255);
     mixedColor.a = 255;
     return mixedColor;
 }
