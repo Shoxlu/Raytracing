@@ -101,11 +101,12 @@ ColorA RayTracer::Trace(Ray &ray, Scene &scene, int depth, Hit& res)
     if(hit_flag)
     {
         Ball& b = closest_b;
+        double k = b.reflexion;
         hit.distance = closest_t;
         hit.hitPoint = ray.start + ray.dir*hit.distance;
         hit.normal = normalize( hit.hitPoint - b.pos);
         ColorA lightColor = {ComputeLighting(hit, scene), 255};
-        color = MixColorsSub(ray, hit.hitPoint, b.color, b.brightness, b.reflexion)*lightColor;
+        color = MixColorsSub(ray, hit.hitPoint, b.color, b.brightness, b.reflexion)*lightColor*(1-k);
         if(depth == 0)
         {
             return color;
@@ -113,11 +114,7 @@ ColorA RayTracer::Trace(Ray &ray, Scene &scene, int depth, Hit& res)
         Ray reflectionRay = ray.Reflect(hit, color);
         Hit next_hit;
         ColorA color2 = Trace(reflectionRay, scene, depth-1, next_hit);
-        if(color2.a != 0)
-        {
-            double k = b.reflexion;
-            color = color2*k+color*(1-k);
-        }
+        color = color2*k+color;
     }
 
     res = hit;
