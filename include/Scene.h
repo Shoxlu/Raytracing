@@ -5,7 +5,9 @@
 
 class Scene{
     public:
-        std::vector<Ball> objects;
+        void AddBall(Ball b);
+        void AddLight(Light Object);
+        std::vector<Object*> objects;
         std::vector<Light> lights;
         Camera camera;
     private:

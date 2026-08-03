@@ -73,15 +73,19 @@ Engine::~Engine() {
 void Engine::Init() {
     simulationState = Running;
     Light l{{200, 0, 40}, {255, 255, 255}};
+    Ball lb({200, 0, 40}, {255, 255, 255, 255}, 0.0, 1.0, 1.0);
     Light l2{{-100, 0, 40}, {0, 0, 255}};
+    Ball lb2({-100, 0, 40}, {0, 0, 255, 255}, 0.0, 1.0, 1.0);
     Light l3{{0, 0, 10}, {0, 255, 0}};
-    Ball b({50, 0, 0}, {255, 0, 255, 255}, 0.0, 0.0, 10.0);
-    Ball b2({0, 0, -100}, {255, 255, 255, 255}, 0.8, 1.0, 100.0);
-    scene.objects.push_back(b);
-    scene.objects.push_back(b2);
+    Ball b(Ball({50, 0, 0}, {255, 0, 255, 255}, 0.0, 0.0, 10.0));
+    Ball b2(Ball({0, 0, -100}, {255, 255, 255, 255}, 0.8, 1.0, 100.0));
+    scene.AddBall(b);
+    scene.AddBall(b2);
     // scene.objects.push_back(b3);
     scene.lights.push_back(l);
+    scene.AddBall(lb);
     scene.lights.push_back(l2);
+    scene.AddBall(lb2);
     //scene.lights.push_back(l3);
 }
 
@@ -133,7 +137,7 @@ void Engine::Run() {
     double theta = 0;
     while (IsRunning())
     { 
-        scene.objects[0].pos.x = cos(theta)*50;
+        scene.objects[0]->pos.x = cos(theta)*50;
         UpdateLogic();
         UpdateGraphic();
         real_time = glfwGetTime();

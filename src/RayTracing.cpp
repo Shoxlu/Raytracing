@@ -3,15 +3,6 @@
 #include <chrono>
 #define DEPTH_REFLECT 20
 
-Ray Ray::Reflect(Hit& hit, ColorA c)
-{
-    Vec p = hit.normal * dot(hit.normal, dir);
-    Vec new_dir = dir - p*2;
-    // printf("1: %f %f %f\n2: %f %f %f\nnormal: %f %f %f\n", ray_dir_neg.x, ray_dir_neg.y, ray_dir_neg.z, dir.x, dir.y, dir.z,
-    // normal.x, normal.y, normal.z);
-    Ray reflectionRay(hit.hitPoint+ hit.normal * 0.001, new_dir, {255, 255, 255}, 1.0);
-    return reflectionRay;
-}
 
 
 void RayTracer::Render(Image &image, Scene &scene)
@@ -78,35 +69,35 @@ void RayTracer::Render(Image &image, Scene &scene)
 
 ColorA RayTracer::Trace(Ray &ray, Scene &scene, int depth, Hit& res)
 {
-
     ColorA color(0, 0,0, 0);
     double closest_t = std::numeric_limits<double>::max();
-    Ball closest_b({0, 0, 0}, {0, 0, 0, 0});
+    Object* closest_b = nullptr;
     bool hit_flag = false;
     Hit hit;
-    for(Ball& b: scene.objects)
+    for(Object* obj: scene.objects)
     {
-        if(Intersect(ray, b, hit))
+        Object& b = *obj;
+        if(b.Intersect(ray, hit))
         {
             if(closest_t > hit.distance)
             {
                 hit_flag = true;
                 closest_t = hit.distance;
-                closest_b = b;
+                closest_b = &b;
                 hit.reflection_coeff = b.reflexion;
                 //printf("closest now %f, t %f\n", closest_t, t);
             }
         }
     }
-    if(hit_flag)
+    if(closest_b)
     {
-        Ball& b = closest_b;
+        Object& b = *closest_b;
         double k = b.reflexion;
         hit.distance = closest_t;
         hit.hitPoint = ray.start + ray.dir*hit.distance;
         hit.normal = normalize( hit.hitPoint - b.pos);
         ColorA lightColor = {ComputeLighting(hit, scene), 255};
-        color = MixColorsSub(ray, hit.hitPoint, b.color, b.brightness, b.reflexion)*lightColor*(1-k);
+        color = MixColorsSub(ray, hit.hitPoint, b.color, b.brightness, b.reflexion)*lightColor;
         if(depth == 0)
         {
             return color;
@@ -114,7 +105,7 @@ ColorA RayTracer::Trace(Ray &ray, Scene &scene, int depth, Hit& res)
         Ray reflectionRay = ray.Reflect(hit, color);
         Hit next_hit;
         ColorA color2 = Trace(reflectionRay, scene, depth-1, next_hit);
-        color = color2*k+color;
+        color = color2*k+color*(1-k);
     }
 
     res = hit;
@@ -124,10 +115,11 @@ ColorA RayTracer::Trace(Ray &ray, Scene &scene, int depth, Hit& res)
 
 bool RayTracer::isOccluded(Ray& ray, float distance, Scene& scene)
 {
-    for(Ball& b: scene.objects)
+    for(Object* obj: scene.objects)
     {
+        Object& b = *obj;
         Hit t;
-        if(Intersect(ray, b, t))
+        if(b.Intersect(ray, t))
         {
             return t.distance <= distance;
         }
