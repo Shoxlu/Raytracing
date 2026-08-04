@@ -69,7 +69,7 @@ void RayTracer::Render(Image &image, Scene &scene)
 
 ColorA RayTracer::Trace(Ray &ray, Scene &scene, int depth, Hit& res)
 {
-    ColorA color(0, 0,0, 0);
+    ColorA color(0, 0, 0, 0);
     double closest_t = std::numeric_limits<double>::max();
     Object* closest_b = nullptr;
     bool hit_flag = false;
@@ -77,16 +77,13 @@ ColorA RayTracer::Trace(Ray &ray, Scene &scene, int depth, Hit& res)
     for(Object* obj: scene.objects)
     {
         Object& b = *obj;
-        if(b.Intersect(ray, hit))
+        if(b.Intersect(ray, hit) && closest_t > hit.distance)
         {
-            if(closest_t > hit.distance)
-            {
-                hit_flag = true;
-                closest_t = hit.distance;
-                closest_b = &b;
-                hit.reflection_coeff = b.reflexion;
-                //printf("closest now %f, t %f\n", closest_t, t);
-            }
+            hit_flag = true;
+            closest_t = hit.distance;
+            closest_b = &b;
+            hit.reflection_coeff = b.reflexion;
+            //printf("closest now %f, t %f\n", closest_t, t);
         }
     }
     if(closest_b)
@@ -113,7 +110,7 @@ ColorA RayTracer::Trace(Ray &ray, Scene &scene, int depth, Hit& res)
     return color;
 }
 
-bool RayTracer::isOccluded(Ray& ray, float distance, Scene& scene)
+bool RayTracer::isOccluded(Ray& ray, float distance, Scene& scene, double& transmission)
 {
     for(Object* obj: scene.objects)
     {
@@ -121,6 +118,7 @@ bool RayTracer::isOccluded(Ray& ray, float distance, Scene& scene)
         Hit t;
         if(b.Intersect(ray, t))
         {
+            
             return t.distance <= distance;
         }
     }
@@ -138,40 +136,16 @@ Color RayTracer::ComputeLighting(Hit& hit, Scene& scene)
         Vec direction = normalize(toLight);
         Ray shadowRay(hit.hitPoint+hit.normal*0.001f, direction);
 
-
-        if(isOccluded(shadowRay, distance, scene))
-        {
-            continue;
-        }
+        double factor = 1.0;
+        isOccluded(shadowRay, distance, scene, factor);
 
         Vec lightDirection = -normalize(hit.hitPoint-l.position);
-        lightcolor += l.color*std::max( dot(hit.normal, lightDirection),0.0);
+        lightcolor += l.color*std::max(dot(hit.normal, lightDirection),0.0)*factor;
     }
     float r = lightcolor.r/255.0;
     float g = lightcolor.g/255.0;
     float b = lightcolor.b/255.0;
     return lightcolor;
-}
-
-bool RayTracer::Intersect(
-    const Ray& ray,
-    const Ball& sphere,
-    Hit& hit)
-{
-    Vec oc = ray.start - sphere.pos;
-
-    double a = dot(ray.dir, ray.dir);
-    double b = 2.0f * dot(oc, ray.dir);
-    double c = dot(oc, oc) - sphere.radius*sphere.radius;
-
-    double delta = b*b - 4*a*c;
-
-    if(delta < 0)
-        return false;
-
-    hit.distance = (-b - sqrt(delta)) / (2*a);
-
-    return hit.distance > 0;
 }
 
 ColorA RayTracer::MixColorsSub(Ray& ray,Vec hitPoint, ColorA& color, double brightness, double reflexion)

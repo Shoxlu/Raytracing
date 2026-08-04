@@ -1,17 +1,17 @@
 #include <Object.h>
 
 
-Object::Object(Vec p,ColorA c, double r, double b): pos(p), color(c), reflexion(r), brightness(b)
+Object::Object(Vec p,ColorA c, double r, double b, double t): pos(p), color(c), reflexion(r), brightness(b), transparency(t)
 {
 
 }
 
 
-Ball::Ball(Vec p, ColorA c, double r , double b, double rad):Object(p, c, r, b), radius(rad)
+Ball::Ball(Vec p, ColorA c, double r , double b, double rad, double t):Object(p, c, r, b, t), radius(rad)
 {
 
 }
-Ball::Ball(Vec p, Color c, double r , double b, double rad):Object(p, {c.r, c.g, c.b, 255}, r, b), radius(rad)
+Ball::Ball(Vec p, Color c, double r , double b, double rad, double t):Object(p, {c.r, c.g, c.b, 255}, r, b, t), radius(rad)
 {
 
 }
@@ -27,7 +27,7 @@ bool Ball::Intersect(const Ray& ray, Hit& hit)
 
     double delta = b*b - 4*a*c;
 
-    if(delta < 0)
+    if(delta < 0 )
         return false;
 
     hit.distance = (-b - sqrt(delta)) / (2*a);

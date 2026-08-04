@@ -5,12 +5,13 @@
 class Object
 {
 public:
-    Object(Vec p, ColorA c, double r = 1.0, double b = 0.0f);
+    Object(Vec p, ColorA c, double r = 1.0, double b = 0.0f, double t = 0.0);
     virtual bool Intersect(const Ray& obj, Hit& result) = 0;
     Vec pos;
     ColorA color;
     double reflexion;
     double brightness;
+    double transparency;
 private:
 };
 
@@ -18,8 +19,8 @@ private:
 class Ball: public Object
 {
 public:
-    Ball(Vec p, ColorA c, double r = 1.0, double b = 0.0, double rad = 1.0);
-    Ball(Vec p, Color c, double r = 1.0, double b = 0.0, double rad = 1.0);
+    Ball(Vec p, ColorA c, double r = 1.0, double b = 0.0, double rad = 1.0, double t = 0.0);
+    Ball(Vec p, Color c, double r = 1.0, double b = 0.0, double rad = 1.0, double t = 0.0);
     bool Intersect(const Ray& obj, Hit& result);
     double radius;
 private:
