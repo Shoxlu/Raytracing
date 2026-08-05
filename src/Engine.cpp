@@ -72,19 +72,19 @@ Engine::~Engine() {
 
 void Engine::Init() {
     simulationState = Running;
-    Light l{{0, 0, 40}, {255, 255, 255}};
+    Light l{{200, 0, 40}, {255, 255, 255}};
     Light l2{{-100, 0, 40}, {0, 255, 255}};
     Light l3{{0, 0, 10}, {0, 255, 0}};
     Ball b({50, 0, 0}, {255, 0, 255, 255}, 0.0, 0.0, 10.0);
-    Ball b2({0, 0, -100}, {255, 255, 255, 255}, 0.8, 1.0, 100.0);
+    Ball b2({0, 0, -100}, {255, 255, 255, 255}, 1.0, 1.0, 100.0);
     Wall w({0, 0, -100}, {255, 255, 0, 255}, {100.0, 100.0}, {1, 0, 1},0.0, 1.0);
     scene.AddBall(b);
-    //scene.AddBall(b2);
-    scene.AddWall(Wall({-100, 0, -100}, {255, 255, 0, 255}, {100.0, 100.0}, {1, 0, 1},0.0, 1.0));
-    scene.AddWall(Wall({100, 0, -100}, {255, 255, 0, 255}, {100.0, 100.0}, {-1, 0, 1},0.0, 1.0));
+    scene.AddBall(b2);
+    //scene.AddWall(Wall({-100, 0, -100}, {255, 255, 0, 255}, {100.0, 100.0}, {0, 0, 1},0.0, 1.0));
+    //scene.AddWall(Wall({100, 0, -100}, {255, 255, 0, 255}, {100.0, 100.0}, {0, 0, 1},0.0, 1.0));
     // scene.objects.push_back(b3);
     scene.AddLight(l);
-    //scene.AddLight(l2);
+    scene.AddLight(l2);
     //scene.lights.push_back(l3);
 }
 

@@ -117,7 +117,7 @@ bool RayTracer::isOccluded(Ray& ray, float distance, Scene& scene, double& trans
         Hit t;
         if(b.Intersect(ray, t))
         {
-            
+            transmission = b.transparency;
             return t.distance <= distance;
         }
     }
@@ -136,7 +136,10 @@ Color RayTracer::ComputeLighting(Hit& hit, Scene& scene)
         Ray shadowRay(hit.hitPoint+hit.normal*0.001f, direction);
 
         double factor = 1.0;
-        isOccluded(shadowRay, distance, scene, factor);
+        if(isOccluded(shadowRay, distance, scene, factor))
+        {
+            continue;
+        }
 
         Vec lightDirection = -normalize(hit.hitPoint-l.position);
         lightcolor += l.color*std::max(dot(hit.normal, lightDirection),0.0)*factor;

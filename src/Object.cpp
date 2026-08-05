@@ -59,12 +59,6 @@ bool Wall::IsPointInRectangle(const Vec &point) const
 
 bool Wall::Intersect(const Ray &ray, Hit &result)
 {
-    Vec e1=  normalize(Vec(size.x, 0, 0));
-    Vec e2= normalize(Vec(0.0, size.y, 0.0));
-    //printf("%f %f\n %f %f\n", e1.x, e1.y, e2.x, e2.y);
-    Vec p = e1*dot(ray.start, e1) + e2*dot(ray.start,e2);
-    double distance =  (ray.start-p).dist();
-
 
     // normal.x * (x-pos.x) + normal.y * (y-pos.y) + normal.z * (z-pos.z) = 0;
     // normal.x * x + normal.y * y + normal.z * z = <normal, pos>;
@@ -72,7 +66,7 @@ bool Wall::Intersect(const Ray &ray, Hit &result)
     // normal.x * ray.dir.x*t + normal.y * ray.dir.y*t + normal.z * ray.dir.z*t = <normal, pos>;
     // t*(normal.x * ray.dir.x + normal.y * ray.dir.y + normal.z * ray.dir.z) = <normal, pos>;
     // t = <normal,pos>/<normal, ray.dir>;
-    distance = dot(normal, ray.dir) != 0 ? dot(normal, pos-ray.start)/dot(normal, ray.dir): 10000000;
+    double distance = dot(normal, ray.dir) != 0 ? dot(normal, pos-ray.start)/dot(normal, ray.dir): 10000000;
     //printf("%f\n", distance);
     //printf("Vec: %f %f %f\n%f\n",p.x, p.y, p.z, distance);
     Vec hitpoint = ray.start + ray.dir*distance ;
