@@ -30,6 +30,7 @@ bool Ball::Intersect(const Ray& ray, Hit& hit)
 
     if(delta < 0 )
         return false;
+    hit.distance = (-b - sqrt(delta)) / (2*a);
     if(hit.distance > 0)
     {
         hit.distance = (-b - sqrt(delta)) / (2*a);
@@ -70,7 +71,7 @@ bool Wall::Intersect(const Ray &ray, Hit &result)
     //printf("%f\n", distance);
     //printf("Vec: %f %f %f\n%f\n",p.x, p.y, p.z, distance);
     Vec hitpoint = ray.start + ray.dir*distance ;
-    if(dot(ray.dir, normal) != 0.0 && IsPointInRectangle(hitpoint))
+    if(distance >= 0 && dot(ray.dir, normal) != 0.0 && IsPointInRectangle(hitpoint))
     {
         // <e1, normal> = 0 <=> e1.x*normal.x + e1.y*normal.y + e1.z*normal.z = 0 <= e1 = (normal.y, -normal.x, 0) or (normal.z,0, -normal.x)
         

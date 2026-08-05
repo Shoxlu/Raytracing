@@ -1,7 +1,7 @@
 ﻿#include <RayTracing.h>
 #include <cstdio>
 #include <chrono>
-#define DEPTH_REFLECT 0
+#define DEPTH_REFLECT 20
 
 
 
@@ -93,7 +93,8 @@ ColorA RayTracer::Trace(Ray &ray, Scene &scene, int depth, Hit& res)
         Object& b = *closest_b;
         double k = b.reflexion;
         ColorA lightColor = {ComputeLighting(best_hit, scene), 255};
-        color = MixColorsSub(ray, best_hit.hitPoint, b.color, b.brightness, b.reflexion)*lightColor;
+        //lightColor = {255, 255, 255, 255};
+        color = MixColorsSub(ray, best_hit.hitPoint, b.color, b.brightness, b.reflexion)*lightColor*(1-k);
         if(depth == 0)
         {
             return color;
@@ -101,7 +102,7 @@ ColorA RayTracer::Trace(Ray &ray, Scene &scene, int depth, Hit& res)
         Ray reflectionRay = ray.Reflect(best_hit, color);
         Hit next_hit;
         ColorA color2 = Trace(reflectionRay, scene, depth-1, next_hit);
-        color = color2*k+color*(1-k);
+        color = color2*k+color;
     }
 
     res = best_hit;
@@ -136,11 +137,7 @@ Color RayTracer::ComputeLighting(Hit& hit, Scene& scene)
         Ray shadowRay(hit.hitPoint+hit.normal*0.001f, direction);
 
         double factor = 1.0;
-        if(isOccluded(shadowRay, distance, scene, factor))
-        {
-            continue;
-        }
-
+        isOccluded(shadowRay, distance, scene, factor);
         Vec lightDirection = -normalize(hit.hitPoint-l.position);
         lightcolor += l.color*std::max(dot(hit.normal, lightDirection),0.0)*factor;
     }
