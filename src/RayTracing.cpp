@@ -1,7 +1,7 @@
 ﻿#include <RayTracing.h>
 #include <cstdio>
 #include <chrono>
-#define DEPTH_REFLECT 20
+#define DEPTH_REFLECT 0
 
 
 
@@ -73,16 +73,18 @@ ColorA RayTracer::Trace(Ray &ray, Scene &scene, int depth, Hit& res)
     double closest_t = std::numeric_limits<double>::max();
     Object* closest_b = nullptr;
     bool hit_flag = false;
-    Hit hit;
+    Hit best_hit;
+    best_hit.distance = closest_t;
     for(Object* obj: scene.objects)
     {
         Object& b = *obj;
-        if(b.Intersect(ray, hit) && closest_t > hit.distance)
+        Hit current_hit;
+        if(b.Intersect(ray, current_hit) && best_hit.distance > current_hit.distance)
         {
             hit_flag = true;
-            closest_t = hit.distance;
+            best_hit = current_hit;
             closest_b = &b;
-            hit.reflection_coeff = b.reflexion;
+            // hit.reflection_coeff = b.reflexion;
             //printf("closest now %f, t %f\n", closest_t, t);
         }
     }
@@ -90,22 +92,19 @@ ColorA RayTracer::Trace(Ray &ray, Scene &scene, int depth, Hit& res)
     {
         Object& b = *closest_b;
         double k = b.reflexion;
-        hit.distance = closest_t;
-        hit.hitPoint = ray.start + ray.dir*hit.distance;
-        hit.normal = normalize( hit.hitPoint - b.pos);
-        ColorA lightColor = {ComputeLighting(hit, scene), 255};
-        color = MixColorsSub(ray, hit.hitPoint, b.color, b.brightness, b.reflexion)*lightColor;
+        ColorA lightColor = {ComputeLighting(best_hit, scene), 255};
+        color = MixColorsSub(ray, best_hit.hitPoint, b.color, b.brightness, b.reflexion)*lightColor;
         if(depth == 0)
         {
             return color;
         }
-        Ray reflectionRay = ray.Reflect(hit, color);
+        Ray reflectionRay = ray.Reflect(best_hit, color);
         Hit next_hit;
         ColorA color2 = Trace(reflectionRay, scene, depth-1, next_hit);
         color = color2*k+color*(1-k);
     }
 
-    res = hit;
+    res = best_hit;
 
     return color;
 }

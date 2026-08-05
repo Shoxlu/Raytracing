@@ -29,7 +29,11 @@ private:
 class Wall: public Object
 {
     public:
-    Wall(Vec center, Vec size, double r = 1.0);
-    double size;
+    Wall(Vec center,ColorA color, Vec size, Vec normal, double r = 1.0, double b= 0.0, double t= 0.0);
+    Wall(Wall& w);
+    bool IsPointInRectangle(const Vec &point) const;
+    bool Intersect(const Ray& obj, Hit& result);
+    Vec size;
+    Vec normal;
     private:
 };

@@ -35,7 +35,7 @@ void GraEngine::Init() {
 
 void GraEngine::UpdateCamera()
 {
-    drawer->UpdateCamera();
+    //drawer->UpdateCamera();
 }
 
 void GraEngine::Update(Image& image)

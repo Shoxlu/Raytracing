@@ -18,7 +18,7 @@ class Vec {
     inline constexpr Vec(double x = 0.0, double y = 0.0, double z = 0.0) : x(x), y(y), z(z){};
     //Renvoie la norme du Vecteur
     inline double dist() const {
-        return sqrtf(dist_sq());
+        return sqrt(dist_sq());
     }
     inline double dist_sq() const {
         return (x * x + y * y + z*z);
