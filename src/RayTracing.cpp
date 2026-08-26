@@ -69,7 +69,7 @@ void RayTracer::Render(Image &image, Scene &scene)
 
 ColorA RayTracer::Trace(Ray &ray, Scene &scene, int depth, Hit& res)
 {
-    ColorA color(0, 0, 0, 0);
+    ColorA color(0, 80, 250, 255);
     double closest_t = std::numeric_limits<double>::max();
     Object* closest_b = nullptr;
     bool hit_flag = false;
@@ -94,7 +94,7 @@ ColorA RayTracer::Trace(Ray &ray, Scene &scene, int depth, Hit& res)
         double k = b.reflexion;
         ColorA lightColor = {ComputeLighting(best_hit, scene), 255};
         //lightColor = {255, 255, 255, 255};
-        color = MixColorsSub(ray, best_hit.hitPoint, b.color, b.brightness, b.reflexion)*lightColor*(1-k);
+        color = MixColorsSub(ray, best_hit.hitPoint, b.color, b.brightness, b.reflexion)*lightColor;
         if(depth == 0)
         {
             return color;
@@ -102,7 +102,7 @@ ColorA RayTracer::Trace(Ray &ray, Scene &scene, int depth, Hit& res)
         Ray reflectionRay = ray.Reflect(best_hit, color);
         Hit next_hit;
         ColorA color2 = Trace(reflectionRay, scene, depth-1, next_hit);
-        color = color2*k+color;
+        color = color2*k+color*(1-k);
     }
 
     res = best_hit;

@@ -72,19 +72,26 @@ Engine::~Engine() {
 
 void Engine::Init() {
     simulationState = Running;
-    Light l{{50, 0, 40}, {255, 255, 255}};
+    Light l{{0, -1000000, 0}, {255, 255, 255}};
     Light l2{{0, 0, 100}, {0, 255, 255}};
     Light l3{{0, 0, 10}, {0, 255, 0}};
-    Ball b({50, 0, 0}, {255, 0, 255, 255}, 0.0, 0.0, 10.0);
-    Ball b2({0, 0, -100}, {255, 255, 255, 255}, 0.9, 1.0, 100.0);
+    Ball b({50, 0, 0}, {255, 0, 255, 255}, 0, 0.0, 5.0);
+    Ball b3({-50, 0, -90}, {255, 128, 255, 255}, 0, 0.0, 5.0);
+    Ball b4({50, 0, -80}, {32, 255, 0, 255}, 0, 0.0, 5.0);
+    Ball b5({-50, 0, -110}, {32, 255, 0, 255}, 1.0, 1.0, 10.0);
+    Ball b2({0, -20, -100}, {255, 255, 255, 255}, 1.0, 1.0, 20.0);
     scene.AddBall(b);
-    //scene.AddBall(b2);
-    scene.AddWall(Wall({0, 0, -100}, {255, 255, 0, 255}, {200.0, 200.0}, {0, 0, 1},0.9, 1.0));
-    scene.AddWall(Wall({-150, 0, -50}, {255, 255, 0, 255}, {100.0, 200.0}, {1, 0, 1},0.9, 1.0));
-    scene.AddWall(Wall({150, 0, -50}, {255, 255, 0, 255}, {100.0, 200.0}, {-1, 0, 1},0.9, 1.0));
+    scene.AddBall(b2);
+    scene.AddBall(b3);
+    scene.AddBall(b4);
+    scene.AddBall(b5);
+    scene.AddWall(Wall({0, 10, 0}, {180, 180, 180, 255}, {100000000000000.0, 1000.0}, {0, -1, 0}, 0.0, 1.0));
+    //scene.AddWall(Wall({-150, 0, -50}, {255, 255, 255, 255}, {100.0, 200.0}, {1, 0, 1}, 0.9, 1.0));
+    //scene.AddWall(Wall({150, 0, -50}, {255, 255, 255, 255}, {100.0, 200.0}, {-1, 0, 1}, 0.9, 1.0));
+    //scene.AddWall(Wall({0, 0, 100}, {255, 255, 255, 255}, {100.0, 200.0}, {0, 0, -1}, 0.9, 1.0));
     // scene.objects.push_back(b3);
     scene.AddLight(l);
-    scene.AddLight(l2);
+   // scene.AddLight(l2);
     //scene.lights.push_back(l3);
 }
 
@@ -112,7 +119,7 @@ void Engine::UpdateWindow() {
 
 void Engine::UpdateLogic() {
     UpdateWindow();
-    graEngine->UpdateCamera();
+    scene.camera = graEngine->drawer->camera;
     //Actualisation des données
     rayTracer->Render(image, scene);
 }
